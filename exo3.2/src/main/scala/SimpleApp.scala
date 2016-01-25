@@ -3,18 +3,21 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 
 object SimpleApp {
-  def decoupage(a:Array[String]) : String = {
+  def decoupage(a:Array[String]) : Array[(String,Int)]  = {
 	val it = a.toIterator
-	var r = Array[(String,String)]()
+	var r = Array[(String,Int)]()
 	var c = it.next()
 	var ancien = c
 
 	while (it.hasNext) {
 		c = it.next()
-		if (c!="" && ancien!="")  r = r :+ (ancien,c)
+		if (c!="" && ancien!="") {
+			var str = ancien + " " + c
+			r = r :+ (str,1)
+		}
 		ancien = c 
 	}
-	return r.mkString
+	return r
 }
 
   def main(args: Array[String]) {
@@ -24,7 +27,7 @@ object SimpleApp {
  	
 	val textFile = spark.textFile("miser.txt")
 
-	val mots = textFile.map(line => decoupage(line.split(" ")))
+	val mots = textFile.flatMap(line => decoupage(line.split(" "))).reduceByKey(_+_)
 	
 	mots.saveAsTextFile("result.txt")
   }

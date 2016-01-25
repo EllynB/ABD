@@ -25,10 +25,14 @@ object SimpleApp {
         val conf = new SparkConf().setAppName("Spark Integrale")
         val spark = new SparkContext(conf)
  	
-	val textFile = spark.textFile("miser.txt")
+	val textFile = spark.textFile("miser.txt", 2)
 
+	val t1 = System.currentTimeMillis()
 	val mots = textFile.flatMap(line => decoupage(line.split(" "))).reduceByKey(_+_)
+
+	println("\n\n Temps d'execution en ms = " + (System.currentTimeMillis()-t1) + "\n\n")
 	
 	mots.saveAsTextFile("result.txt")
+	spark.stop()
   }
 }

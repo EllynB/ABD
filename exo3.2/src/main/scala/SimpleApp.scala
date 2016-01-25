@@ -3,18 +3,18 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 
 object SimpleApp {
-  def decoupage(a:Array[String]) : Array[(String,String)] = {
+  def decoupage(a:Array[String]) : String = {
 	val it = a.toIterator
 	var r = Array[(String,String)]()
-	var c = it.next
+	var c = it.next()
 	var ancien = c
 
 	while (it.hasNext) {
-		c = it.next
-		r = r :+ (c,ancien)
+		c = it.next()
+		if (c!="" && ancien!="")  r = r :+ (ancien,c)
 		ancien = c 
 	}
-	return r
+	return r.mkString
 }
 
   def main(args: Array[String]) {
@@ -23,20 +23,9 @@ object SimpleApp {
         val spark = new SparkContext(conf)
  	
 	val textFile = spark.textFile("miser.txt")
-	var c = 0;
 
-	//Array("Hklgr bnj , yui gers. fes").map( s => s.split('.')).flatten.map(s => s.split(',')).flatten
-
-	//val texts = textFile.flatMap(line => line.split(',')).flatMap(line => line.split('.')).flatMap(line  => line.split('!')).flatMap(line  => line.split('?')).flatMap(line => line.split('.'))
-	
 	val mots = textFile.map(line => decoupage(line.split(" ")))
 	
-
 	mots.saveAsTextFile("result.txt")
-	
-	//val counts = textFile.flatMap(line => line.split(" "))
-        //         .map(word => (word, 1))
-        //         .reduceByKey(_ + _)
-	//counts.saveAsTextFile("hdfs://...") 
   }
 }

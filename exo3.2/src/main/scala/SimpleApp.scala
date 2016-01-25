@@ -3,15 +3,15 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 
 object SimpleApp {
-  def decoupage(ligne : Array) {
-	val it = Iterator(ligne)
-	var r = new Array()
+  def decoupage(a:Array[String]) : Array[(String,String)] = {
+	val it = a.toIterator
+	var r = Array[(String,String)]()
 	var c = it.next
 	var ancien = c
 
-	while (it.hasNext()) {
+	while (it.hasNext) {
 		c = it.next
-		r.add(c,ancien)
+		r = r :+ (c,ancien)
 		ancien = c 
 	}
 	return r
